@@ -4,33 +4,6 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 
-
-const expected_data =
-{
-    ID: 1308,
-    Amount: 12580,
-    currency: "NGN",
-    CustomerEmail: "anon8@#customer.io",
-    SplitInfo: [
-        {
-            "SplitType": "FLAT",
-            "SplitValue": 45,
-            "SplitEntityId": "LNPYACC0019"
-        },
-        {
-            "SplitType": "RATIO",
-            "SplitValue": 3,
-            "SplitEntityId": "LNPYACC0011"
-        },
-        {
-            "SplitType": "PERCENTAGE",
-            "SplitValue": 3,
-            "SplitEntityId": "LNPYACC0015"
-        }
-    ]
-
-}
-
 const calculateSplit = (obj) => {
     if (
         !obj["ID"] ||
