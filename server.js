@@ -16,6 +16,9 @@ const calculateSplit = (obj) => {
     }
     const data = obj
     const split = obj["SplitInfo"]
+    if (split.length > 20) {
+        return 1
+    }
     let amount = data["Amount"]
     let ratios = 0
     for (let index = 0; index < split.length; index++) {
@@ -29,6 +32,12 @@ const calculateSplit = (obj) => {
         if (split[index]["SplitType"] == 'RATIO')
         {
             ratios += split[index]["SplitValue"]
+        }
+
+        if (split[index]["SplitType"] == 'FLAT'){
+            if (split[index]["SplitValue"] < 0){
+                return 1
+            }
         }
     }
     const response = {
@@ -60,21 +69,32 @@ const calculateSplit = (obj) => {
         }
     })
 
+    if (amount < 0){
+        return 1
+    }
     if (ratio.length > 0) {
         amount =  0
     }
 
     response["SplitBreakdown"] = [...flat, ...percentage, ...ratio]
+    let total = 0
+    for (let index = 0; index < response["SplitBreakdown"].length; index++) {
+       total += response["SplitBreakdown"][index]["Amount"]  
+    }
+    if (total != data["Amount"]){
+        return 1
+    }
+
     response["Balance"] = amount
     return response
 
 }
 
 
-app.post("/split-payment/compute", (req, res) => {
+app.post("/split-payments/compute", (req, res) => {
     const result = calculateSplit(req.body)
     if (result == 1) {
-        res.status(400).send("Incomplete post body fields")
+        res.status(400).send("One or more requirements not met")
     }
     res.json(result)
 })
